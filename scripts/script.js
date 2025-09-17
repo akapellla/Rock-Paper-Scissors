@@ -1,72 +1,82 @@
- const arrGame = ['rock', 'paper', 'scissors'];
-    let humanScore = 0;
-    let computerScore = 0;
+class RockPaperScissors {
+  constructor() {
+    this.arrGame = ['rock', 'paper', 'scissors'];
+    this.humanScore = 0;
+    this.computerScore = 0;
 
-    const resultsDiv = document.querySelector("#results");
-    const scoreDiv = document.querySelector("#score");
+    this.resultsDiv = document.querySelector("#results");
+    this.scoreDiv = document.querySelector("#score");
+    this.buttons = document.querySelectorAll("button[data-choice]");
 
-    function getComputerChoice() {
-      return arrGame[Math.floor(Math.random() * arrGame.length)];
+    this.bindEvents();
+  }
+
+  getComputerChoice() {
+    return this.arrGame[Math.floor(Math.random() * this.arrGame.length)];
+  }
+
+  playRound(humanChoice, computerChoice) {
+    if (humanChoice === computerChoice) {
+      this.addResult("Draw! Both chose " + humanChoice);
+    } else if (
+      (humanChoice === 'rock' && computerChoice === 'scissors') ||
+      (humanChoice === 'paper' && computerChoice === 'rock') ||
+      (humanChoice === 'scissors' && computerChoice === 'paper')
+    ) {
+      this.humanScore++;
+      this.addResult("You win! " + humanChoice + " beats " + computerChoice);
+    } else {
+      this.computerScore++;
+      this.addResult("You lose! " + computerChoice + " beats " + humanChoice);
     }
 
-    function playRound(humanChoice, computerChoice) {
-      if (humanChoice === computerChoice) {
-        addResult("Draw! Both chose " + humanChoice);
-      } else if (
-        (humanChoice === 'rock' && computerChoice === 'scissors') ||
-        (humanChoice === 'paper' && computerChoice === 'rock') ||
-        (humanChoice === 'scissors' && computerChoice === 'paper')
-      ) {
-        humanScore++;
-        addResult("You win! " + humanChoice + " beats " + computerChoice);
-      } else {
-        computerScore++;
-        addResult("You lose! " + computerChoice + " beats " + humanChoice);
-      }
+    this.updateScore();
 
-      updateScore();
+    if (this.humanScore === 5 || this.computerScore === 5) {
+      this.showWinner();
+      this.disableButtons();
+    }
+  }
 
-      if (humanScore === 5 || computerScore === 5) {
-        showWinner();
-        disableButtons();
-      }
+  addResult(message) {
+    const p = document.createElement('p');
+    p.textContent = message;
+    this.resultsDiv.appendChild(p);
+  }
+
+  updateScore() {
+    this.scoreDiv.textContent = `Player: ${this.humanScore} | Computer: ${this.computerScore}`;
+  }
+
+  showWinner() {
+    const p = document.createElement('p');
+    p.style.fontWeight = 'bold';
+
+    if (this.humanScore > this.computerScore) {
+      p.textContent = "🎉 You win the game!";
+    } else {
+      p.textContent = "😞 You lost the game.";
     }
 
-    function addResult(message) {
-      const p = document.createElement('p');
-      p.textContent = message;
-      resultsDiv.appendChild(p);
-    }
+    this.resultsDiv.appendChild(p);
+  }
 
-    function updateScore() {
-      scoreDiv.textContent = `Player: ${humanScore} | Computer: ${computerScore}`;
-    }
+  disableButtons() {
+    this.buttons.forEach(btn => {
+      btn.disabled = true;
+    });
+  }
 
-    function showWinner() {
-      const p = document.createElement('p');
-      p.style.fontWeight = 'bold';
-
-      if (humanScore > computerScore) {
-        p.textContent = "🎉 You win the game!";
-      } else {
-        p.textContent = "😞 You lost the game.";
-      }
-
-      resultsDiv.appendChild(p);
-    }
-
-    function disableButtons() {
-      document.querySelectorAll("button").forEach(btn => {
-        btn.disabled = true;
-      });
-    }
-
-    // Добавляем обработчики на кнопки
-    const buttons = document.querySelectorAll("button[data-choice]");
-    buttons.forEach(button => {
+  bindEvents() {
+    this.buttons.forEach(button => {
       button.addEventListener('click', () => {
         const humanChoice = button.getAttribute('data-choice');
-        const computerChoice = getComputerChoice();
-        playRound(humanChoice, computerChoice);
+        const computerChoice = this.getComputerChoice();
+        this.playRound(humanChoice, computerChoice);
       });
     });
+  }
+}
+
+
+const game = new RockPaperScissors();
